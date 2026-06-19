@@ -1,0 +1,41 @@
+# CI for the payments micro-frontend. Type-checks, lints, and builds the
+# federated bundle, then asserts that assets/remoteEntry.js was emitted — the
+# single most important artifact of a Module Federation remote.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        # Use a clean, reproducible install when a lockfile is present.
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build (tsc -b && vite build)
+        run: npm run build
+
+      - name: Verify remoteEntry.js was emitted
+        run: |
+          test -f dist/assets/remoteEntry.js \
+            && echo "remoteEntry.js present" \
+            || (echo "remoteEntry.js MISSING — federation build is broken" && exit 1)
+
+      - name: Build Docker image
+        run: docker build -t securebank-mfe-payments:ci .
