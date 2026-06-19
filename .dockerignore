@@ -1,0 +1,15 @@
+# Keep the Docker build context small and reproducible: never ship local
+# node_modules or a stale dist into the image — they are rebuilt inside.
+node_modules
+dist
+dist-ssr
+.git
+.github
+.vite
+*.log
+npm-debug.log*
+.DS_Store
+Dockerfile
+.dockerignore
+README.md
+docs
