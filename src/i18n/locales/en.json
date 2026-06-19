@@ -1,0 +1,83 @@
+{
+  "transfer": {
+    "title": "Transfer money",
+    "subtitle": "Move funds between your accounts or to a saved beneficiary.",
+    "fromAccount": "From account",
+    "fromAccountPlaceholder": "Select a source account",
+    "toBeneficiary": "To beneficiary",
+    "toBeneficiaryPlaceholder": "Select a beneficiary",
+    "amount": "Amount",
+    "amountPlaceholder": "0.00",
+    "description": "Description (optional)",
+    "descriptionPlaceholder": "e.g. Rent for June",
+    "available": "Available: {{balance}}",
+    "submit": "Send transfer",
+    "submitting": "Sending…",
+    "noAccounts": "No accounts available.",
+    "noBeneficiaries": "No beneficiaries yet. Add one on the Beneficiaries screen.",
+    "success": {
+      "title": "Transfer completed",
+      "reference": "Reference: {{reference}}",
+      "newBalance": "New balance: {{balance}}",
+      "another": "Make another transfer"
+    },
+    "error": {
+      "title": "Transfer could not be completed",
+      "INSUFFICIENT_FUNDS": "Insufficient funds in the selected account.",
+      "FRAUD_BLOCK": "This transfer was blocked by our fraud checks for your protection. Please contact support if you believe this is a mistake.",
+      "DEBIT_DECLINED": "The source account declined the debit.",
+      "CREDIT_DECLINED": "The destination account could not be credited.",
+      "FAILED": "The transfer failed and any debited amount has been refunded. Please try again.",
+      "generic": "Something went wrong. Please try again.",
+      "unauthorized": "Your session has expired. Please sign in again."
+    }
+  },
+  "beneficiaries": {
+    "title": "Beneficiaries",
+    "subtitle": "People and accounts you can send money to.",
+    "add": "Add beneficiary",
+    "empty": "You have no saved beneficiaries yet.",
+    "table": {
+      "name": "Name",
+      "account": "Account number",
+      "ifsc": "IFSC",
+      "nickname": "Nickname"
+    },
+    "dialog": {
+      "title": "Add a beneficiary",
+      "description": "Save a payee so you can transfer to them quickly.",
+      "name": "Full name",
+      "namePlaceholder": "e.g. Anita Sharma",
+      "accountNumber": "Account number",
+      "accountNumberPlaceholder": "e.g. 1234567890",
+      "ifsc": "IFSC (optional)",
+      "ifscPlaceholder": "e.g. HDFC0001234",
+      "nickname": "Nickname (optional)",
+      "nicknamePlaceholder": "e.g. Landlord",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…"
+    },
+    "toast": {
+      "addedTitle": "Beneficiary added",
+      "addedBody": "{{name}} can now receive transfers.",
+      "errorTitle": "Could not add beneficiary"
+    }
+  },
+  "validation": {
+    "required": "This field is required.",
+    "fromRequired": "Please choose a source account.",
+    "toRequired": "Please choose a beneficiary.",
+    "amountPositive": "Enter an amount greater than zero.",
+    "amountNumber": "Enter a valid amount.",
+    "amountMax": "Amount exceeds the available balance.",
+    "nameRequired": "Name is required.",
+    "accountRequired": "Account number is required.",
+    "accountDigits": "Account number must be 6–18 digits.",
+    "ifscFormat": "Enter a valid IFSC code (e.g. HDFC0001234)."
+  },
+  "common": {
+    "retry": "Retry",
+    "loadingError": "Could not load data. Please try again."
+  }
+}
