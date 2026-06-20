@@ -1,8 +1,13 @@
-import i18n from 'i18next';
+import * as i18nextNs from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import en from './locales/en.json';
 import hi from './locales/hi.json';
 import mr from './locales/mr.json';
+
+// Federation interop: the shared i18next arrives as the module *namespace*, which lacks
+// instance methods like addResourceBundle()/isInitialized; normalize to the real instance.
+const i18n = ((i18nextNs as unknown as { default?: typeof import('i18next').default }).default
+  ?? (i18nextNs as unknown as typeof import('i18next').default));
 
 // ---------------------------------------------------------------------------
 // i18next instance.
