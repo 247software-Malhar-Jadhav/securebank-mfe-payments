@@ -21,27 +21,32 @@ const i18n = ((i18nextNs as unknown as { default?: typeof import('i18next').defa
 // Standalone, the shell isn't there, so we init here with en/hi/mr.
 // ---------------------------------------------------------------------------
 
-const NS = 'payments';
+// Our components call useTranslation() with NO explicit namespace, so they resolve keys
+// against the instance's default namespace. When embedded that default is the shell's
+// "translation" namespace — so we MUST contribute our keys there (not a private "payments"
+// namespace), otherwise embedded screens show raw keys like "transfer.title". Our key
+// prefixes (transfer.*, validation.*, beneficiaries.*) don't collide with the shell's.
+const NS = 'translation';
 
 if (!i18n.isInitialized) {
   // STANDALONE path: nobody initialised i18next yet.
   void i18n.use(initReactI18next).init({
     resources: {
-      en: { payments: en },
-      hi: { payments: hi },
-      mr: { payments: mr },
+      en: { translation: en },
+      hi: { translation: hi },
+      mr: { translation: mr },
     },
     lng: 'en',
     fallbackLng: 'en',
-    ns: [NS],
     defaultNS: NS,
     interpolation: { escapeValue: false }, // React already escapes.
   });
 } else {
-  // EMBEDDED path: merge our bundles into the shell's live instance.
-  i18n.addResourceBundle('en', NS, en, true, true);
-  i18n.addResourceBundle('hi', NS, hi, true, true);
-  i18n.addResourceBundle('mr', NS, mr, true, true);
+  // EMBEDDED path: merge our bundles into the shell's live instance under its default
+  // namespace. deep=true merges; overwrite=false keeps the shell's strings authoritative.
+  i18n.addResourceBundle('en', NS, en, true, false);
+  i18n.addResourceBundle('hi', NS, hi, true, false);
+  i18n.addResourceBundle('mr', NS, mr, true, false);
 }
 
 export default i18n;

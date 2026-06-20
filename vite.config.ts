@@ -72,15 +72,21 @@ export default defineConfig({
       // out of `SharedConfig`, but the option IS honoured at runtime (it is the
       // standard Module Federation API and the shell uses the identical shape).
       // We cast so strict `tsc -b` accepts the correct runtime config.
+      // requiredVersion:false forces the remote to ALWAYS use the host-provided singleton
+      // instances. Pinning a requiredVersion made federation load a SECOND copy of
+      // react / react-redux here, which then saw a null React and crashed with
+      // "Cannot read properties of null (reading 'useMemo')". This now matches the shell
+      // and the other (working) remote exactly.
       shared: {
-        react: { singleton: true, requiredVersion: '^18.3.1' },
-        'react-dom': { singleton: true, requiredVersion: '^18.3.1' },
-        'react-router-dom': { singleton: true, requiredVersion: '^6.26.1' },
-        'react-i18next': { singleton: true, requiredVersion: '^15.0.1' },
-        i18next: { singleton: true, requiredVersion: '^23.14.0' },
-        '@reduxjs/toolkit': { singleton: true, requiredVersion: '^2.2.7' },
-        'react-redux': { singleton: true, requiredVersion: '^9.1.2' },
-      } as Record<string, { singleton: boolean; requiredVersion: string }>,
+        react: { singleton: true, requiredVersion: false },
+        'react-dom': { singleton: true, requiredVersion: false },
+        'react-router-dom': { singleton: true, requiredVersion: false },
+        'react-i18next': { singleton: true, requiredVersion: false },
+        i18next: { singleton: true, requiredVersion: false },
+        '@reduxjs/toolkit': { singleton: true, requiredVersion: false },
+        'react-redux': { singleton: true, requiredVersion: false },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any,
     }),
   ],
 
