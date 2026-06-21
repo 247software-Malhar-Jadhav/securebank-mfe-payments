@@ -45,3 +45,67 @@ export function getToken(): string | null {
     return null;
   }
 }
+
+// ---------------------------------------------------------------------------
+// SILENT REFRESH. The shell persists {user, accessToken, refreshToken} as JSON
+// under "securebank.auth". On a 401 we exchange the refresh token for a new
+// access token, write it back to the shared channels, and retry — so an expired
+// access token self-heals instead of showing "Could not load data".
+// ---------------------------------------------------------------------------
+const AUTH_BLOB_KEY = 'securebank.auth';
+const ALL_TOKEN_KEYS = ['securebank.token', 'securebank_token'];
+
+function readRefreshToken(): string | null {
+  try {
+    const raw = window.localStorage.getItem(AUTH_BLOB_KEY);
+    return raw ? (JSON.parse(raw).refreshToken ?? null) : null;
+  } catch {
+    return null;
+  }
+}
+
+function storeRefreshed(accessToken: string, refreshToken: string | null) {
+  try {
+    for (const k of ALL_TOKEN_KEYS) window.localStorage.setItem(k, accessToken);
+    const raw = window.localStorage.getItem(AUTH_BLOB_KEY);
+    const blob = raw ? JSON.parse(raw) : {};
+    blob.accessToken = accessToken;
+    if (refreshToken) blob.refreshToken = refreshToken;
+    window.localStorage.setItem(AUTH_BLOB_KEY, JSON.stringify(blob));
+  } catch {
+    /* non-fatal */
+  }
+}
+
+/** Exchange the refresh token for a fresh access token. Returns it, or null on failure. */
+export async function tryRefreshToken(): Promise<string | null> {
+  const refreshToken = readRefreshToken();
+  if (!refreshToken) return null;
+  try {
+    const res = await fetch('/api/auth/refresh', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data?.accessToken) {
+      storeRefreshed(data.accessToken, data.refreshToken ?? null);
+      return data.accessToken as string;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/** Clear the session and bounce to the shell's login. */
+export function clearSessionAndRedirect(): void {
+  try {
+    for (const k of ALL_TOKEN_KEYS) window.localStorage.removeItem(k);
+    window.localStorage.removeItem(AUTH_BLOB_KEY);
+  } catch {
+    /* non-fatal */
+  }
+  if (typeof window !== 'undefined') window.location.href = '/login';
+}

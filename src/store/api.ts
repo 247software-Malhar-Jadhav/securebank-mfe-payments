@@ -6,7 +6,7 @@ import {
   type FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react';
 import i18n from '@/i18n';
-import { getToken } from '@/lib/auth';
+import { getToken, tryRefreshToken, clearSessionAndRedirect } from '@/lib/auth';
 import type {
   Account,
   Beneficiary,
@@ -43,17 +43,25 @@ const rawBaseQuery = fetchBaseQuery({
 });
 
 /**
- * Thin wrapper around the base query. Kept as a seam so we can add cross-
- * cutting concerns later (e.g. 401 -> ask shell to refresh) without touching
- * every endpoint. This is the ADAPTER pattern: endpoints depend on a stable
- * BaseQueryFn, not on fetch details.
+ * Wrapper that adds silent refresh-on-401: if the access token expired, exchange the
+ * refresh token for a new one, write it to the shared channel, and retry the request.
+ * If refresh is impossible, bounce to login rather than dead-ending on "Could not load".
  */
 const baseQuery: BaseQueryFn<
   string | FetchArgs,
   unknown,
   FetchBaseQueryError
 > = async (args, apiSlice, extraOptions) => {
-  return rawBaseQuery(args, apiSlice, extraOptions);
+  let result = await rawBaseQuery(args, apiSlice, extraOptions);
+  if (result.error && result.error.status === 401) {
+    const fresh = await tryRefreshToken();
+    if (fresh) {
+      result = await rawBaseQuery(args, apiSlice, extraOptions);
+    } else {
+      clearSessionAndRedirect();
+    }
+  }
+  return result;
 };
 
 export const paymentsApi = createApi({
